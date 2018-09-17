@@ -269,6 +269,7 @@ def main():
     t1.start()
     # t1.join()
     nono_solver_win.run()
+    event_next_step.set()
     event_stop.set()
 
 
