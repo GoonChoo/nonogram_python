@@ -35,10 +35,12 @@ class NonogramSolver:
     def solve(self):
         # self.event_wait.wait()
         while not self.event_stop.is_set():
-            time.sleep(1)
+            # time.sleep(1)
+            self.event_wait.wait()
             print('Solver step')
             self.solvedField[2][2] = not self.solvedField[2][2]
             self.update()
+            self.event_wait.clear()
         else:
             print('Solver stop')
 

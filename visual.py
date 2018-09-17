@@ -30,10 +30,12 @@ class NonogramMain:
 
 
 class NonogramSolverView:
-    def __init__(self, master: tk.Tk, solver: NonogramSolver, event_update: th.Event):
+    def __init__(self, master: tk.Tk, solver: NonogramSolver,
+                 event_next_step:th.Event, event_update: th.Event):
         self.master = master
         self.master.title("Nonogram solver")
         self.solver = solver
+        self.event_next_step = event_next_step
         self.event_update = event_update
 
         # self.frame_header_empty = tk.Frame(self.master, bg='green', height=120, width=100, bd=1)
@@ -64,7 +66,8 @@ class NonogramSolverView:
         self.canvas_header_left.pack(fill=tk.BOTH, expand=1)
         self.canvas_solve.pack(fill=tk.BOTH, expand=1)
 
-        self.buttonNextStep = tk.Button(self.canvas_header_empty, text='Next step')
+        self.buttonNextStep = tk.Button(self.canvas_header_empty, text='Next step',
+                                        command = self.btn_next_step_handler)
         self.buttonNextStep.pack(fill=tk.BOTH, expand=1)
 
         self.master.after(100, self.process_event)
@@ -78,6 +81,9 @@ class NonogramSolverView:
     def run(self):
         self.nonogram_solver_draw()
         self.master.mainloop()
+
+    def btn_next_step_handler(self):
+        self.event_next_step.set()
 
     def nonogram_solver_draw(self):
         nonogram = self.solver.nonogram
@@ -247,16 +253,17 @@ def start_solver(solver: NonogramSolver):
 
 
 def main():
-    nono = nono_db.get_nonogram_from_id(19001)
+    nono = nono_db.get_nonogram_from_id(20566)
 
-    event_solver_wait = th.Event()
+    event_next_step = th.Event()
     event_update = th.Event()
     event_stop = th.Event()
+    event_next_step.clear()
 
-    nono_solver = NonogramSolver(nono, event_solver_wait, event_update, event_stop)
+    nono_solver = NonogramSolver(nono, event_next_step, event_update, event_stop)
 
     root = tk.Tk()
-    nono_solver_win = NonogramSolverView(root, nono_solver, event_update)
+    nono_solver_win = NonogramSolverView(root, nono_solver, event_next_step, event_update)
     # root.after(1000, start_solver(nono_solver))
     t1 = th.Thread(target=nono_solver.solve)
     t1.start()
