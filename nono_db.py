@@ -4,7 +4,7 @@ import pickle
 import nonogram
 
 def get_db_dir():
-    return os.getcwd() + '\\db\\'
+    return os.getcwd() + '/db/'
 
 def write_nonogram_to_db(nonogram):
     directory = get_db_dir()
