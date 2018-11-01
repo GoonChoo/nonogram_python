@@ -23,6 +23,28 @@ class Nonogram:
         self.id = nono_id
 
 
+class SolverRow:
+    is_changed = True
+    row = []
+
+    def __init__(self, row: list):
+        for cell in row:
+            self.row.append(cell)
+
+
+class SolverHeader:
+    def __init__(self, header: Header):
+        self.rows = self.create_solve_rows(header.rows)
+        self.columns = self.create_solve_rows(header.columns)
+
+    @staticmethod
+    def create_solve_rows(nono_rows: list)-> list:
+        solve_rows = []
+        for c in nono_rows:
+            solve_rows.append(SolverRow(c))
+        return solve_rows
+
+
 class NonogramSolver:
     def __init__(self, nonogram: Nonogram, event_wait: th.Event,
                  event_change: th.Event, event_stop: th.Event):
@@ -30,17 +52,44 @@ class NonogramSolver:
         self.event_stop = event_stop
         self.event_wait = event_wait
         self.event_change = event_change
+        self.solveHeader = SolverHeader(nonogram.header)
         self.solvedField = np.full((len(nonogram.header.rows), len(nonogram.header.columns)), 0)
 
     def solve(self):
         # self.event_wait.wait()
         while not self.event_stop.is_set():
+            # не работает без этой строчки
             time.sleep(1)
+
+            is_changed = 0
+            is_changed += self.check_rows(self.solveHeader.rows)
+            is_changed += self.check_rows(self.solveHeader.columns)
+            # TODO: придумать, что делать, если решать больше нечего
+            if not is_changed:
+                pass
+
             print('Solver step')
-            self.solvedField[2][2] = not self.solvedField[2][2]
             self.update()
         else:
             print('Solver stop')
+
+    def check_rows(self, rows: SolverRow)-> bool:
+
+        is_solved = False
+        for row in self.solveHeader.rows:
+            if row.is_changed:
+                # Если в строке есть измененеия, то отдать ее на обработку
+                self.row_process(row)
+                is_solved = False
+        return is_solved
+
+    @staticmethod
+    def row_process(row: SolverRow):
+        """Применить к строке методы решения"""
+        # TODO: тут происходит вызов всех методов решения
+
+    def overlap(self):
+        pass
 
     def update(self):
         if self.event_change:
