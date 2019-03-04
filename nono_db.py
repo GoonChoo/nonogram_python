@@ -25,8 +25,8 @@ def write_nonogram_to_db(nonogram):
             print('Не смог создать файл')
             print(e)
 
+
 def get_file_name_from_id(id):
-    dir = get_db_dir()
     names = get_file_names_all()
     for s in names:
         index = s.find('-')
@@ -43,14 +43,14 @@ def get_nonogram_from_id(id):
         file_name = get_db_dir() + file_name
         try:
             with open(file_name, 'rb') as f:
-                nonogram = pickle.load(f)
-                return nonogram
+                return pickle.load(f)
         except OSError as e:
             print('Не смог прочитать файл')
             print(e)
             return None
     else:
         return None
+
 
 def get_nonogram_from_file_name(name):
     if file_name_is_in_db(name):
@@ -64,12 +64,14 @@ def get_nonogram_from_file_name(name):
             print(e)
             return None
 
+
 def file_name_is_in_db(name):
     names = get_file_names_all()
     for n in names:
         if n == name:
             return True
     return False
+
 
 def get_file_names_all():
     dir = get_db_dir()
