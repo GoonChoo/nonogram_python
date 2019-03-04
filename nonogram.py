@@ -21,6 +21,7 @@ class Nonogram:
         self.answer = answer
         self.name = name
         self.id = nono_id
+        self.solvedField = np.full((len(header.rows), len(header.columns)), 0)
 
 
 class NonogramSolver:
@@ -30,7 +31,6 @@ class NonogramSolver:
         self.event_stop = event_stop
         self.event_wait = event_wait
         self.event_change = event_change
-        self.solvedField = np.full((len(nonogram.header.rows), len(nonogram.header.columns)), 0)
 
     def solve(self):
         # self.event_wait.wait()
@@ -39,7 +39,7 @@ class NonogramSolver:
             if self.event_wait.wait():
                 self.event_wait.clear()
                 print('Solver step')
-                self.solvedField[2][2] = not self.solvedField[2][2]
+                self.nonogram.solvedField[2][2] = not self.solvedField[2][2]
                 self.update()
 
             # self.event_wait.wait()

@@ -31,7 +31,7 @@ class NonogramMain:
 
 class NonogramSolverView:
     def __init__(self, master: tk.Tk, solver: NonogramSolver,
-                 event_next_step:th.Event, event_update: th.Event):
+                 event_next_step: th.Event, event_update: th.Event):
         self.master = master
         self.master.title("Nonogram solver")
         self.solver = solver
@@ -145,7 +145,7 @@ class NonogramSolverView:
 
     def draw_solve(self):
         self.canvas_solve.delete('all')
-        answer = self.solver.solvedField
+        answer = self.solver.nonogram.solvedField
         for i in range(answer.shape[0]):
             for j in range(answer.shape[1]):
                 x0 = j * cell_width
