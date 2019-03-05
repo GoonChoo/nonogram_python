@@ -2,6 +2,8 @@ import numpy as np
 import threading as th
 import time
 
+from numpy.core.multiarray import ndarray
+
 
 class Header:
     rows = []
@@ -13,6 +15,7 @@ class Header:
 
 
 class Nonogram:
+    solvedField: ndarray
     header = Header
     name = ''
 

@@ -90,12 +90,12 @@ def save_nonogram_from_url(url):
 
 
 def parser():
-    for i in range(19000, 19100):
+    for i in range(20566, 20567):
         url = r'https://www.nonograms.ru/nonograms/i/' + str(i)
         save_nonogram_from_url(url)
 
 
-# parser()
+parser()
 
 # nono = Nonogram
 # print('Nonogram ', end='')
