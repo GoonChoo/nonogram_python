@@ -15,7 +15,6 @@ class Header:
 
 
 class Nonogram:
-    solvedField: ndarray
     header = Header
     name = ''
 
@@ -49,6 +48,8 @@ class SolverHeader:
 
 
 class NonogramSolver:
+    solvedField: ndarray
+
     def __init__(self, nonogram: Nonogram, event_wait: th.Event,
                  event_change: th.Event, event_stop: th.Event):
         self.nonogram = nonogram

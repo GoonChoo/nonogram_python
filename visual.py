@@ -145,7 +145,7 @@ class NonogramSolverView:
 
     def draw_solve(self):
         self.canvas_solve.delete('all')
-        answer = self.solver.nonogram.solvedField
+        answer = self.solver.solvedField
         for i in range(answer.shape[0]):
             for j in range(answer.shape[1]):
                 x0 = j * cell_width
