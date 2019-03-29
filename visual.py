@@ -1,5 +1,4 @@
 import tkinter as tk
-import threading as th
 
 from nonogram import Nonogram
 from nonogram import Header
@@ -30,13 +29,10 @@ class NonogramMain:
 
 
 class NonogramSolverView:
-    def __init__(self, master: tk.Tk, solver: NonogramSolver,
-                 event_next_step: th.Event, event_update: th.Event):
+    def __init__(self, master: tk.Tk, solver: NonogramSolver):
         self.master = master
         self.master.title("Nonogram solver")
         self.solver = solver
-        self.event_next_step = event_next_step
-        self.event_update = event_update
 
         # self.frame_header_empty = tk.Frame(self.master, bg='green', height=120, width=100, bd=1)
         # self.frame_header_top = tk.Frame(self.master, bg='red', height=120, width=200, bd=1)
@@ -67,23 +63,17 @@ class NonogramSolverView:
         self.canvas_solve.pack(fill=tk.BOTH, expand=1)
 
         self.buttonNextStep = tk.Button(self.canvas_header_empty, text='Next step',
-                                        command = self.btn_next_step_handler)
+                                        command=self.btn_next_step_handler)
         self.buttonNextStep.pack(fill=tk.BOTH, expand=1)
 
-        self.master.after(100, self.process_event)
-
-    def process_event(self):
-        if self.event_update.is_set():
-            self.event_update.clear()
-            self.update()
-        self.master.after(100, self.process_event)
+        # self.master.after(100, self.process_event)
 
     def run(self):
         self.nonogram_solver_draw()
         self.master.mainloop()
 
     def btn_next_step_handler(self):
-        self.event_next_step.set()
+        print('Next step press')
 
     def nonogram_solver_draw(self):
         nonogram = self.solver.nonogram
@@ -249,28 +239,15 @@ def nono_draw(canvas: tk.Canvas, nonogram):
 # root.mainloop()
 
 def start_solver(solver: NonogramSolver):
-    solver.solve()
+    solver.solve_step()
 
 
 def main():
     nono = nono_db.get_nonogram_from_id(20566)
-
-    event_next_step = th.Event()
-    event_update = th.Event()
-    event_stop = th.Event()
-    event_next_step.clear()
-
-    nono_solver = NonogramSolver(nono, event_next_step, event_update, event_stop)
-
+    nono_solver = NonogramSolver(nono)
     root = tk.Tk()
-    nono_solver_win = NonogramSolverView(root, nono_solver, event_next_step, event_update)
-    # root.after(1000, start_solver(nono_solver))
-    t1 = th.Thread(target=nono_solver.solve)
-    t1.start()
-    # t1.join()
+    nono_solver_win = NonogramSolverView(root, nono_solver)
     nono_solver_win.run()
-    event_next_step.set()
-    event_stop.set()
 
 
 if __name__ == "__main__":
