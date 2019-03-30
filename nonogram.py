@@ -32,6 +32,15 @@ class SolverRow:
     def __init__(self, row: list):
         self.row = list(row)
 
+    def __len__(self):
+        return len(self.row)
+
+    def __iter__(self):
+        return iter(self.row)
+
+    def __getitem__(self, item):
+        return self.row[item]
+
 
 class SolverHeader:
     def __init__(self, header: Header):

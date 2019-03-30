@@ -7,6 +7,10 @@ import nono_db
 
 cell_width = 20
 cell_height = 20
+row_is_changed_width = 1
+row_is_changed_height = 1
+x_0 = 0
+y_0 = 0
 
 
 class NonogramMain:
@@ -34,39 +38,15 @@ class NonogramSolverView:
         self.master.title("Nonogram solver")
         self.solver = solver
 
-        # self.frame_header_empty = tk.Frame(self.master, bg='green', height=120, width=100, bd=1)
-        # self.frame_header_top = tk.Frame(self.master, bg='red', height=120, width=200, bd=1)
-        # self.frame_header_left = tk.Frame(self.master, bg='blue', height=200, width=100, bd=1)
-        # self.frame_nonogram_solve = tk.Frame(self.master, bg='yellow', height=200, width=200, bd=1)
-
-        self.frame_header_empty = tk.Frame(self.master)
-        self.frame_header_top = tk.Frame(self.master)
-        self.frame_header_left = tk.Frame(self.master)
-        self.frame_nonogram_solve = tk.Frame(self.master)
-
-        self.frame_header_empty.grid(row=1, column=1)
-        self.frame_header_top.grid(row=1, column=2)
-        self.frame_header_left.grid(row=2, column=1)
-        self.frame_nonogram_solve.grid(row=2, column=2)
-
-        self.canvas_header_empty = tk.Canvas(self.frame_header_empty, bd=0, highlightthickness=0,
-                                             width=100, height=120)
-
-        self.canvas_header_top = tk.Canvas(self.frame_header_top, bd=0, highlightthickness=0,
-                                           width=100, height=120)
-        self.canvas_header_left = tk.Canvas(self.frame_header_left, bd=0, highlightthickness=0)
-        self.canvas_solve = tk.Canvas(self.frame_nonogram_solve, bd=0, highlightthickness=0)
-
-        self.canvas_header_empty.pack(fill=tk.BOTH, expand=1)
-        self.canvas_header_top.pack(fill=tk.BOTH, expand=1)
-        self.canvas_header_left.pack(fill=tk.BOTH, expand=1)
-        self.canvas_solve.pack(fill=tk.BOTH, expand=1)
-
+        self.canvas_header_empty = tk.Canvas(self.master, bd=0, highlightthickness=0)
+        self.canvas_header_top = tk.Canvas(self.master, bd=0, highlightthickness=0)
+        self.canvas_header_top_is_changed = tk.Canvas(self.master, bd=0, highlightthickness=0)
+        self.canvas_header_left = tk.Canvas(self.master, bd=0, highlightthickness=0)
+        self.canvas_header_left_is_changed = tk.Canvas(self.master, bd=0, highlightthickness=0)
+        self.canvas_solve = tk.Canvas(self.master, bd=0, highlightthickness=0)
         self.buttonNextStep = tk.Button(self.canvas_header_empty, text='Next step',
                                         command=self.btn_next_step_handler)
-        self.buttonNextStep.pack(fill=tk.BOTH, expand=1)
-
-        # self.master.after(100, self.process_event)
+        self.buttonNextStep.place(relx=0.5, rely=0.5, anchor="center")
 
     def run(self):
         self.nonogram_solver_draw()
@@ -75,39 +55,54 @@ class NonogramSolverView:
     def btn_next_step_handler(self):
         print('Next step press')
 
+    # TODO: переделать обновление отрисовки, сделать первую отрисовку и обновление
     def nonogram_solver_draw(self):
-        nonogram = self.solver.nonogram
-        if not nonogram:
-            print('Nonogram not exist')
-        else:
-            top_header_len = len(nonogram.header.columns)
-            max_column = max(nonogram.header.columns, key=len)
+        solve_header = self.solver.solveHeader
+        if solve_header:
+            top_header_len = len(solve_header.columns)
+            max_column = max(solve_header.columns, key=len)
             top_header_height = len(max_column)
 
-            max_row = max(nonogram.header.rows, key=len)
+            max_row = max(solve_header.rows, key=len)
             left_header_width = len(max_row)
-            left_header_len = len(nonogram.header.rows)
+            left_header_len = len(solve_header.rows)
 
-            empty_width = left_header_width * cell_width
-            empty_height = top_header_height * cell_height
+            empty_width = (left_header_width + row_is_changed_width) * cell_width
+            empty_height = (top_header_height + row_is_changed_height) * cell_height
+
+            win_width = empty_width + top_header_len*cell_width
+            win_height = empty_height + left_header_len*cell_height
+            win_settings = "%dx%d" % (win_width, win_height)
+            self.master.geometry(win_settings)
+
+            self.canvas_header_empty.place(x=x_0, y=y_0)
+            self.canvas_header_top_is_changed.place(x=x_0+empty_width, y=0)
+            self.canvas_header_top.place(x=x_0+empty_width, y=y_0+row_is_changed_height*cell_height)
+            self.canvas_header_left_is_changed.place(x=x_0, y=y_0+empty_height)
+            self.canvas_header_left.place(x=x_0+row_is_changed_width*cell_width, y=y_0+empty_height)
+            self.canvas_solve.place(x=x_0+empty_width, y=y_0+empty_height)
 
             self.canvas_header_empty.delete('all')
             self.canvas_header_empty.config(width=empty_width, height=empty_height)
 
+            self.canvas_header_top_is_changed.delete('all')
+            self.canvas_header_top_is_changed.config(width=top_header_len * cell_width,
+                                                     height=cell_height)
             self.canvas_header_top.delete('all')
             self.canvas_header_top.config(width=top_header_len * cell_width,
-                                          height=empty_height)
-
+                                          height=top_header_height * cell_height)
+            self.canvas_header_left_is_changed.delete('all')
+            self.canvas_header_left_is_changed.config(width=cell_width,
+                                                      height=left_header_len * cell_height)
             self.canvas_header_left.delete('all')
-            self.canvas_header_left.config(width=empty_width,
-                                           height=left_header_len*cell_height)
-
+            self.canvas_header_left.config(width=left_header_width * cell_height,
+                                           height=left_header_len * cell_height)
             self.canvas_solve.delete('all')
-            self.canvas_solve.config(width=top_header_len*cell_width,
+            self.canvas_solve.config(width=top_header_len * cell_width,
                                      height=left_header_len * cell_height)
 
             # draw header top
-            columns = nonogram.header.columns
+            columns = solve_header.columns
             for i in range(top_header_height, 0, -1):
                 for j in range(top_header_len):
                     x0 = j * cell_width
@@ -120,7 +115,7 @@ class NonogramSolverView:
                     self.draw_header_cell(self.canvas_header_top, x0, y0, cell_data)
 
             # draw header left
-            rows = nonogram.header.rows
+            rows = solve_header.rows
             for i in range(left_header_len):
                 for j in range(left_header_width, 0, -1):
                     x0 = (left_header_width - j) * cell_width
@@ -132,6 +127,8 @@ class NonogramSolverView:
                     self.draw_header_cell(self.canvas_header_left, x0, y0, cell_data)
 
             self.draw_solve()
+        else:
+            print('Nonogram not exist')
 
     def draw_solve(self):
         self.canvas_solve.delete('all')
